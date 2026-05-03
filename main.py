@@ -23,7 +23,17 @@ def health_check():
 
 @app.post("/risk-score")
 def calculate_risk(data: PolicyInput):
+    reason = []
     score = 0
+
+    if data.claims_count > 0:
+        reason.append("claims history")
+
+    if data.late_payments > 0:
+        reason.append("late payments")
+
+    if data.policy_lapse_history:
+        reason.append("lapse history")
 
     score += data.claims_count * 20
     score += data.late_payments * 15
@@ -47,5 +57,6 @@ def calculate_risk(data: PolicyInput):
     return {
         "risk_score": score,
         "risk_level": risk_level,
-        "recommendation": recommendation
+        "recommendation": recommendation,
+        "risk_factors": reason
     }
